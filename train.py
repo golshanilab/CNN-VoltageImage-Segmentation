@@ -1,7 +1,7 @@
 from voltimseg.dataset import NeuronSegmentionDataset
-from voltimseg.model import UNet
+from voltimseg.model_2 import UNet
 from voltimseg import config
-from torch.nn import CrossEntropyLoss
+from torch.nn import BCEWithLogitsLoss
 from torch.optim import RMSprop
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
@@ -38,7 +38,7 @@ trainLoader = DataLoader(trainDS, shuffle=True, batch_size=config.BATCH_SIZE, pi
 testLoader = DataLoader(testDS, shuffle=False, batch_size=config.BATCH_SIZE, pin_memory=config.PIN_MEMORY, num_workers=os.cpu_count()-2)
 
 unet = UNet().to(config.DEVICE)
-loss_fn = CrossEntropyLoss()
+loss_fn = BCEWithLogitsLoss()
 opt = RMSprop(unet.parameters(), lr=config.INIT_LR)
 
 trainSteps = len(trainDS) // config.BATCH_SIZE
@@ -60,8 +60,16 @@ for e in tqdm(range(config.NUM_EPOCHS)):
 
         (x,y) = (x.to(config.DEVICE), y.to(config.DEVICE))
 
+
+        x = x.float()
+        y = y.float()
+
+        print(x.max())
+        print(y.max())
+
         pred = unet(x)
-        loss = loss_fn(pred, y)
+        print(pred.max())
+        loss = loss_fn(pred.squeeze(), y)
 
         opt.zero_grad()
         loss.backward()
@@ -77,9 +85,11 @@ for e in tqdm(range(config.NUM_EPOCHS)):
 
             (x,y) = (x.to(config.DEVICE), y.to(config.DEVICE))
 
-            pred = unet(x)
+            x = x.float()
+            y = y.float()
 
-            totalTestLoss += loss_fn(pred, y)
+            pred = unet(x)
+            totalTestLoss += loss_fn(pred.squeeze(), y)
 
     avgTrainLoss = totalTrainLoss / trainSteps
     avgTestLoss = totalTestLoss / testSteps
@@ -94,15 +104,15 @@ for e in tqdm(range(config.NUM_EPOCHS)):
 
     print("[INFO] total time takes to train model: {:.2f}s".format(endTime-startTime))
 
-    plt.style.use("ggplot")
-    plt.figure()
-    plt.plot(H["train_loss"], label="train_loss")
-    plt.plot(H["test_loss"], label="test_loss")
-    plt.title("Training Loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.legend(loc="lower left")
-    plt.savefig(config.PLOT_PATH)
+plt.style.use("ggplot")
+plt.figure()
+plt.plot(H["train_loss"], label="train_loss")
+plt.plot(H["test_loss"], label="test_loss")
+plt.title("Training Loss")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.legend(loc="lower left")
+plt.savefig(config.PLOT_PATH)
 
-    torch.save(unet, config.MODEL_PATH)
+torch.save(unet, config.MODEL_PATH)
     

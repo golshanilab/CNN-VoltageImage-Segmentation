@@ -56,4 +56,4 @@ unet = torch.load(config.MODEL_PATH).to(config.DEVICE)
 # iterate over the randomly selected test image paths
 for path in imagePaths:
 	# make predictions and visualize the results
-	make_predictions(unet, path)
+	make_prediction(unet, path)
