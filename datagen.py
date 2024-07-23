@@ -52,7 +52,7 @@ def training_data_generation(stacks, frames):
                 avg = avg_image[y:y+64, x:x+64]
 
                 tif.imwrite(os.path.normpath(stacks+"/training_data/images/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), np.array([avg,mxm]))
-                tif.imwrite(os.path.normpath(stacks+"/training_data/masks/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), roi)
+                tif.imwrite(os.path.normpath(stacks+"/training_data/masks/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), np.array([roi]))
 
 
 

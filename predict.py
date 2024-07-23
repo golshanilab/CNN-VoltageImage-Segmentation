@@ -27,7 +27,7 @@ def make_prediction(model, imagePath):
     with torch.no_grad():
 
         image = tif.imread(imagePath)
-        image = image.astype(np.float32) / 255.0
+        image = image.astype(np.float32)
         orig = image.copy()
 
         filename = imagePath.split(os.path.sep)[-1]
@@ -35,15 +35,15 @@ def make_prediction(model, imagePath):
 
         gtMask = tif.imread(groundTruthPath)
 
+        image = np.expand_dims(image, axis=0)
         image = torch.from_numpy(image).to(config.DEVICE)
-
-        predMAsk = model(image).squeeze()
-        predMask = predMAsk.cpu().numpy()
+        predMask = model(image).squeeze()
+        predMask = predMask.cpu().numpy()
 
         predMask = (predMask > config.THRESHOLD) * 255
         predMask = predMask.astype(np.uint8)
 
-        prepare_plot(orig, gtMask, predMask)
+        prepare_plot(np.sum(orig,axis=0), gtMask.squeeze(), predMask)
 
         return predMask
     

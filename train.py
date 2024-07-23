@@ -64,12 +64,12 @@ for e in tqdm(range(config.NUM_EPOCHS)):
         x = x.float()
         y = y.float()
 
-        print(x.max())
-        print(y.max())
+        #print(x.shape)
+        #print(y.shape)
 
         pred = unet(x)
         print(pred.max())
-        loss = loss_fn(pred.squeeze(), y)
+        loss = loss_fn(pred, y)
 
         opt.zero_grad()
         loss.backward()
@@ -89,7 +89,7 @@ for e in tqdm(range(config.NUM_EPOCHS)):
             y = y.float()
 
             pred = unet(x)
-            totalTestLoss += loss_fn(pred.squeeze(), y)
+            totalTestLoss += loss_fn(pred, y)
 
     avgTrainLoss = totalTrainLoss / trainSteps
     avgTestLoss = totalTestLoss / testSteps

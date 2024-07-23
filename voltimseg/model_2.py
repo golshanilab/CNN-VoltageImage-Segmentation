@@ -14,15 +14,18 @@ class Block(Module):
 	def __init__(self, inChannels, outChannels):
 		super().__init__()
 		# store the convolution and RELU layers
-		self.conv1 = Conv2d(inChannels, outChannels, 3)
+		self.conv1 = Conv2d(inChannels, outChannels, 3, padding=1)
 		self.relu = ReLU()
-		self.conv2 = Conv2d(outChannels, outChannels, 3)
+		self.conv2 = Conv2d(outChannels, outChannels, 3, padding=1)
 	def forward(self, x):
 		# apply CONV => RELU => CONV block to the inputs and return it
-		return self.conv2(self.relu(self.conv1(x)))
+		y = self.conv1(x)
+		y = self.relu(y)
+		x = self.conv2(y)
+		return x
 	
 class Encoder(Module):
-	def __init__(self, channels=(2, 16, 32, 64)):
+	def __init__(self, channels=(2, 32, 64, 128, 256)):
 		super().__init__()
 		# store the encoder blocks and maxpooling layer
 		self.encBlocks = ModuleList(
@@ -44,7 +47,7 @@ class Encoder(Module):
 	
 
 class Decoder(Module):
-	def __init__(self, channels=(64, 32, 16)):
+	def __init__(self, channels=(256, 128, 64, 32)):
 		super().__init__()
 		# initialize the number of channels, upsampler blocks, and
 		# decoder blocks
@@ -78,7 +81,7 @@ class Decoder(Module):
 		return encFeatures
 	
 class UNet(Module):
-	def __init__(self, encChannels=(2, 16, 32, 64), decChannels=(64, 32, 16), nbClasses=1, retainDim=True, outSize=(config.INPUT_IMAGE_HEIGHT,  config.INPUT_IMAGE_WIDTH)):
+	def __init__(self, encChannels=(2, 32, 64, 128, 256), decChannels=(256, 128, 64, 32), nbClasses=1, retainDim=True, outSize=(config.INPUT_IMAGE_HEIGHT,  config.INPUT_IMAGE_WIDTH)):
 		super().__init__()
 		# initialize the encoder and decoder
 		self.encoder = Encoder(encChannels)

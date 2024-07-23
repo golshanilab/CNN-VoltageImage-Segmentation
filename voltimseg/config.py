@@ -8,11 +8,11 @@ MASK_DATASET_PATH = os.path.join(DATASET_PATH,"masks")
 
 TEST_SPLIT = 0.4
 
-#DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-DEVICE = "cpu"
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+#DEVICE = "cpu"
 
-#PIN_MEMORY = True if DEVICE == "cuda" else False
-PIN_MEMORY = False
+PIN_MEMORY = True if DEVICE == "cuda" else False
+#PIN_MEMORY = False
 
 NUM_CHANNELS = 1
 NUM_CLASSES = 1
