@@ -6,7 +6,7 @@ DATASET_PATH = os.path.join("dataset","train")
 IMAGE_DATASET_PATH = os.path.join(DATASET_PATH,"images")
 MASK_DATASET_PATH = os.path.join(DATASET_PATH,"masks")
 
-TEST_SPLIT = 0.4
+TEST_SPLIT = 0.2
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 #DEVICE = "cpu"

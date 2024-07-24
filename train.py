@@ -2,7 +2,7 @@ from voltimseg.dataset import NeuronSegmentionDataset
 from voltimseg.model_2 import UNet
 from voltimseg import config
 from torch.nn import BCEWithLogitsLoss
-from torch.optim import RMSprop
+from torch.optim import Adam
 from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 from torchvision import transforms
@@ -39,10 +39,13 @@ testLoader = DataLoader(testDS, shuffle=False, batch_size=config.BATCH_SIZE, pin
 
 unet = UNet().to(config.DEVICE)
 loss_fn = BCEWithLogitsLoss()
-opt = RMSprop(unet.parameters(), lr=config.INIT_LR)
+opt = Adam(unet.parameters(), lr=config.INIT_LR)
 
 trainSteps = len(trainDS) // config.BATCH_SIZE
 testSteps = len(testDS) // config.BATCH_SIZE
+
+if testSteps == 0:
+    testSteps = 1
 
 H = {"train_loss": [], "test_loss": []}
 
@@ -68,7 +71,6 @@ for e in tqdm(range(config.NUM_EPOCHS)):
         #print(y.shape)
 
         pred = unet(x)
-        print(pred.max())
         loss = loss_fn(pred, y)
 
         opt.zero_grad()

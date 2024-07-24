@@ -43,7 +43,7 @@ def make_prediction(model, imagePath):
         predMask = (predMask > config.THRESHOLD) * 255
         predMask = predMask.astype(np.uint8)
 
-        prepare_plot(np.sum(orig,axis=0), gtMask.squeeze(), predMask)
+        prepare_plot(np.average(orig,axis=0), gtMask.squeeze(), predMask)
 
         return predMask
     

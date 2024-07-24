@@ -35,10 +35,10 @@ def training_data_generation(stacks, frames):
         data = imageData[start:end]
 
         avg_image = np.average(data, axis=0)
-        avg_image = avg_image/np.max(avg_image)
-        filtered = pb_correct(data, 500)
+        #avg_image = avg_image/np.max(avg_image)
+        filtered = data - np.average(data,axis=(1,2))[:,np.newaxis,np.newaxis]
         max_med = np.max(filtered, axis=0) - np.median(filtered, axis=0)
-        max_med = max_med/np.max(max_med)
+        #max_med = max_med/np.max(max_med)
 
         cols = n//32 - 1
         rows = m//32 - 1
@@ -51,8 +51,12 @@ def training_data_generation(stacks, frames):
                 mxm = max_med[y:y+64, x:x+64]
                 avg = avg_image[y:y+64, x:x+64]
 
-                tif.imwrite(os.path.normpath(stacks+"/training_data/images/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), np.array([avg,mxm]))
-                tif.imwrite(os.path.normpath(stacks+"/training_data/masks/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), np.array([roi]))
+                mxm = mxm/np.max(mxm)
+                avg = avg/np.max(avg)
+
+                if np.max(roi) > 0:
+                    tif.imwrite(os.path.normpath(stacks+"/training_data/images/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), np.array([avg,mxm]))
+                    tif.imwrite(os.path.normpath(stacks+"/training_data/masks/"+data_name+"_set_"+str(i)+"_"+str(j)+"_"+str(k)+".tif"), np.array([roi]))
 
 
 
